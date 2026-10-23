@@ -1,0 +1,13 @@
+{
+  "name": "lovemeter-game",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Petit jeu fictif de compatibilité avec stockage local et panneau d'administration.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "setup": "node setup.js",
+    "start": "node server.js"
+  }
+}

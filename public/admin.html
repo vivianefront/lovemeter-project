@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4e8ff">
+  <meta name="description" content="Administration privée de Love Meter.">
+  <title>Administration — Love Meter</title>
+  <style>
+    :root { color-scheme: light; --ink: #2e2340; --muted: #7e738f; --purple: #7c3aed; --pink: #db2777; --line: #e9e2f2; --bg: #f8f6fc; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; background: radial-gradient(circle at 2% 0%, #f1dcff 0, transparent 29%), var(--bg); color: var(--ink); font: 15px/1.5 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    button, input, select { font: inherit; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 17px max(18px, calc((100vw - 1180px) / 2)); background: #ffffffc9; border-bottom: 1px solid var(--line); backdrop-filter: blur(12px); }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 900; letter-spacing: -.035em; }
+    .brand-mark { display: grid; place-items: center; width: 37px; height: 37px; border-radius: 12px; color: white; background: linear-gradient(135deg, #ec4899, #8b5cf6); font-size: 20px; }
+    .top-actions { display: flex; gap: 9px; align-items: center; }
+    .wrap { max-width: 1180px; padding: 26px 18px 42px; margin: 0 auto; }
+    .intro { display: flex; align-items: flex-end; justify-content: space-between; gap: 15px; margin-bottom: 21px; }
+    h1 { font-size: clamp(1.7rem, 5vw, 2.45rem); letter-spacing: -.055em; line-height: 1.1; margin: 0 0 8px; }
+    h2 { margin: 0 0 5px; font-size: 1.15rem; letter-spacing: -.025em; }
+    p { margin: 0; }
+    .muted { color: var(--muted); }
+    .eyebrow { color: #8b5cf6; font-size: .74rem; font-weight: 900; text-transform: uppercase; letter-spacing: .15em; margin-bottom: 7px; }
+    .button { border: 1px solid var(--line); color: var(--ink); background: white; border-radius: 11px; padding: 9px 13px; cursor: pointer; font-weight: 800; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 7px; white-space: nowrap; }
+    .button:hover { border-color: #c8b4e6; }
+    .button.primary { color: white; border: 0; background: linear-gradient(100deg, #db2777, #7c3aed); }
+    .button.danger { color: #b91c1c; background: #fff7f7; border-color: #f4caca; }
+    .button.small { font-size: .82rem; padding: 7px 9px; }
+    .button:disabled { opacity: .6; cursor: wait; }
+    .panel { border: 1px solid #fff; background: #ffffffdc; border-radius: 19px; padding: 21px; box-shadow: 0 12px 35px #46236e0d; }
+    .login-wrap { max-width: 450px; margin: 8vh auto; }
+    .login-wrap .panel { padding: clamp(22px, 5vw, 32px); }
+    .login-icon { display: grid; place-items: center; width: 55px; height: 55px; border-radius: 18px; color: #7c3aed; background: #f2e8ff; font-size: 25px; margin-bottom: 17px; }
+    .field { margin-top: 17px; }
+    label { display: block; font-weight: 800; font-size: .86rem; margin: 0 0 7px; }
+    input, select { width: 100%; border: 1px solid #ded5e9; border-radius: 11px; padding: 11px 12px; color: var(--ink); background: #fff; outline: none; min-width: 0; }
+    input:focus, select:focus { border-color: #a78bfa; box-shadow: 0 0 0 3px #8b5cf61c; }
+    .login-submit { width: 100%; margin-top: 19px; min-height: 45px; }
+    .message { min-height: 21px; font-size: .86rem; color: #be185d; margin-top: 10px; }
+    .privacy-note { margin-top: 15px; padding: 11px 12px; background: #f7f2ff; border-radius: 11px; color: #76628e; font-size: .78rem; line-height: 1.6; }
+    #dashboard[hidden], #login[hidden] { display: none; }
+    .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 13px; margin-bottom: 20px; }
+    .stat { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 17px; }
+    .stat-label { color: var(--muted); font-size: .79rem; font-weight: 700; margin-bottom: 9px; }
+    .stat-num { font-size: 1.85rem; letter-spacing: -.06em; font-weight: 950; line-height: 1; }
+    .stat:nth-child(1) .stat-num { color: #7c3aed; }
+    .stat:nth-child(2) .stat-num { color: #db2777; }
+    .stat:nth-child(3) .stat-num { color: #0f766e; }
+    .section-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 17px; }
+    .section-head p { color: var(--muted); font-size: .84rem; }
+    .section-block { margin-top: 20px; }
+    .searchbar { display: flex; gap: 8px; margin-bottom: 14px; }
+    .searchbar input { flex: 1; }
+    .table-wrap { overflow-x: auto; }
+    table { border-collapse: collapse; width: 100%; min-width: 650px; }
+    th, td { text-align: left; padding: 12px 10px; border-bottom: 1px solid #eee8f4; vertical-align: middle; font-size: .87rem; }
+    th { color: #8a7d98; font-size: .73rem; text-transform: uppercase; letter-spacing: .08em; background: #fcfaff; }
+    tbody tr:last-child td { border-bottom: 0; }
+    .score { display: inline-flex; align-items: center; justify-content: center; min-width: 55px; padding: 5px 8px; border-radius: 9px; font-weight: 900; color: #a21caf; background: #fce7f3; }
+    .type-label { display: inline-block; margin-top: 4px; color: #887d95; font-size: .73rem; }
+    .rule-list { display: grid; gap: 10px; }
+    .rule-row { display: grid; grid-template-columns: minmax(120px, 1fr) minmax(120px, 1fr) 95px minmax(155px, 1.1fr) auto; gap: 9px; align-items: end; border: 1px solid var(--line); border-radius: 13px; padding: 12px; background: #fff; }
+    .rule-row label { font-size: .72rem; color: #8a7d98; margin-bottom: 5px; }
+    .rule-row input { padding: 9px 10px; font-size: .86rem; }
+    .rule-meta { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; min-width: 0; }
+    .rule-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+    .enabled-tag { border-radius: 999px; background: #dcfce7; color: #166534; padding: 3px 7px; font-weight: 850; font-size: .7rem; }
+    .disabled-tag { border-radius: 999px; background: #f1f0f4; color: #706879; padding: 3px 7px; font-weight: 850; font-size: .7rem; }
+    .add-rule { display: grid; grid-template-columns: minmax(120px, 1fr) minmax(120px, 1fr) 100px minmax(150px, 1fr) auto; gap: 9px; align-items: end; padding: 15px; border: 1px dashed #d7c7e8; border-radius: 14px; background: #fcfaff; margin-bottom: 16px; }
+    .add-rule label { font-size: .75rem; }
+    .add-rule input { font-size: .86rem; }
+    .empty { padding: 27px 12px; text-align: center; color: var(--muted); }
+    .footnote { font-size: .77rem; line-height: 1.6; color: #877995; margin-top: 12px; }
+    #globalMessage { margin: 10px 0; min-height: 22px; font-size: .88rem; color: #a21caf; }
+    @media (max-width: 850px) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } .rule-row, .add-rule { grid-template-columns: repeat(2, minmax(0, 1fr)); } .rule-meta, .rule-actions { grid-column: 1 / -1; } }
+    @media (max-width: 510px) { .topbar { padding: 12px 14px; } .wrap { padding: 20px 12px 32px; } .intro { align-items: flex-start; flex-direction: column; } .panel { padding: 15px; border-radius: 15px; } .stats { gap: 8px; } .stat { padding: 12px; } .stat-num { font-size: 1.55rem; } .section-head { align-items: flex-start; flex-direction: column; } .searchbar { flex-direction: column; } .rule-row, .add-rule { grid-template-columns: 1fr 1fr; } }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><div class="brand-mark" aria-hidden="true">♥</div><span>Love Meter <span class="muted">/ Admin</span></span></div>
+    <div class="top-actions">
+      <a class="button small" href="/" rel="noopener">↗ Voir le jeu</a>
+      <button class="button small" id="logoutButton" type="button" hidden>Déconnexion</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section id="login" class="login-wrap">
+      <div class="panel">
+        <div class="login-icon" aria-hidden="true">🔐</div>
+        <div class="eyebrow">Zone privée</div>
+        <h1>Administration</h1>
+        <p class="muted">Connecte-toi pour consulter les tests enregistrés et gérer les règles spéciales du Love Meter.</p>
+        <form id="loginForm">
+          <div class="field"><label for="password">Mot de passe administrateur</label><input id="password" type="password" minlength="12" autocomplete="current-password" required></div>
+          <button class="button primary login-submit" id="loginButton" type="submit">Se connecter</button>
+          <p class="message" id="loginMessage" role="status" aria-live="polite"></p>
+        </form>
+        <p class="privacy-note">La connexion est contrôlée par le serveur. Ne partage pas ton mot de passe ni le fichier <strong>.env</strong>.</p>
+      </div>
+    </section>
+
+    <section id="dashboard" hidden>
+      <div class="intro">
+        <div><div class="eyebrow">Vue d'ensemble</div><h1>Le tableau de bord</h1><p class="muted">Les scores déjà enregistrés restent inchangés, même si tu modifies une règle plus tard.</p></div>
+        <button class="button" id="refreshButton" type="button">↻ Actualiser</button>
+      </div>
+      <div id="globalMessage" role="status" aria-live="polite"></div>
+      <div class="stats" aria-label="Statistiques">
+        <div class="stat"><div class="stat-label">Tests sauvegardés</div><div class="stat-num" id="totalTests">0</div></div>
+        <div class="stat"><div class="stat-label">Tests par règle spéciale</div><div class="stat-num" id="specialTests">0</div></div>
+        <div class="stat"><div class="stat-label">Tests classiques</div><div class="stat-num" id="normalTests">0</div></div>
+        <div class="stat"><div class="stat-label">Règles actives</div><div class="stat-num" id="enabledRules">0</div></div>
+      </div>
+
+      <section class="panel section-block">
+        <div class="section-head"><div><h2>Tests enregistrés</h2><p>Les noms ne sont visibles que dans cet espace administrateur.</p></div><span class="muted" id="testCount">0 résultat</span></div>
+        <form class="searchbar" id="searchForm">
+          <input id="searchInput" type="search" maxlength="100" placeholder="Rechercher un prénom ou un nom…" aria-label="Rechercher des tests">
+          <button class="button" type="submit">Rechercher</button>
+          <button class="button" id="clearSearch" type="button">Effacer</button>
+        </form>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Personne 1</th><th>Personne 2</th><th>Score</th><th>Type</th><th>Date</th><th>Action</th></tr></thead>
+            <tbody id="testsBody"></tbody>
+          </table>
+          <div class="empty" id="emptyTests" hidden>Aucun test ne correspond à cette recherche.</div>
+        </div>
+        <p class="footnote" id="testsFootnote">La page affiche au maximum les 200 résultats les plus récents correspondant à la recherche.</p>
+      </section>
+
+      <section class="panel section-block">
+        <div class="section-head"><div><h2>Règles spéciales</h2><p>Un mot-clé peut se trouver n'importe où dans le nom complet. L'ordre des deux personnes ne compte pas.</p></div><span class="muted" id="ruleCount">0 règle</span></div>
+        <form id="addRuleForm" class="add-rule">
+          <div><label for="leftKeyword">Mot-clé A</label><input id="leftKeyword" maxlength="80" placeholder="Ex. : Obame" required></div>
+          <div><label for="rightKeyword">Mot-clé B</label><input id="rightKeyword" maxlength="80" placeholder="Ex. : Esthimée" required></div>
+          <div><label for="newScore">Pourcentage</label><input id="newScore" type="number" min="1" max="100" value="100" required></div>
+          <div><label for="ruleLabel">Description (facultatif)</label><input id="ruleLabel" maxlength="160" placeholder="Ex. : Association secrète"></div>
+          <button class="button primary" type="submit">＋ Ajouter</button>
+        </form>
+        <div class="rule-list" id="rulesList"></div>
+        <p class="footnote">Quand un nouveau duo est testé, la première règle active qui correspond est utilisée. Les règles sont vérifiées dans les deux sens. Désactive ou supprime les règles que tu ne veux plus utiliser. Les tests déjà sauvegardés ne changent pas.</p>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const loginSection = document.getElementById('login');
+    const dashboard = document.getElementById('dashboard');
+    const loginForm = document.getElementById('loginForm');
+    const loginButton = document.getElementById('loginButton');
+    const loginMessage = document.getElementById('loginMessage');
+    const logoutButton = document.getElementById('logoutButton');
+    const globalMessage = document.getElementById('globalMessage');
+    const testsBody = document.getElementById('testsBody');
+    const emptyTests = document.getElementById('emptyTests');
+    const rulesList = document.getElementById('rulesList');
+    let currentSearch = '';
+
+    async function api(url, options = {}) {
+      const response = await fetch(url, { credentials: 'same-origin', ...options, headers: { ...(options.headers || {}), ...(options.body ? { 'Content-Type': 'application/json' } : {}) } });
+      let data = {};
+      try { data = await response.json(); } catch { /* réponse non JSON */ }
+      if (!response.ok) {
+        if (response.status === 401 && url !== '/api/admin/login') showLogin();
+        throw new Error(data.error || `Erreur HTTP ${response.status}`);
+      }
+      return data;
+    }
+
+    function showLogin() {
+      loginSection.hidden = false;
+      dashboard.hidden = true;
+      logoutButton.hidden = true;
+    }
+
+    function showDashboard() {
+      loginSection.hidden = true;
+      dashboard.hidden = false;
+      logoutButton.hidden = false;
+    }
+
+    function makeCell(text, className) {
+      const td = document.createElement('td');
+      if (className) td.className = className;
+      td.textContent = text;
+      return td;
+    }
+
+    function formatDate(value) {
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return '—';
+      return new Intl.DateTimeFormat('fr-FR', { dateStyle: 'short', timeStyle: 'short' }).format(date);
+    }
+
+    async function loadStats() {
+      const stats = await api('/api/admin/stats');
+      document.getElementById('totalTests').textContent = stats.totalTests;
+      document.getElementById('specialTests').textContent = stats.specialTests;
+      document.getElementById('normalTests').textContent = stats.normalTests;
+      document.getElementById('enabledRules').textContent = stats.enabledRules;
+    }
+
+    async function loadTests() {
+      const data = await api(`/api/admin/tests?q=${encodeURIComponent(currentSearch)}`);
+      testsBody.replaceChildren();
+      emptyTests.hidden = data.tests.length !== 0;
+      document.getElementById('testCount').textContent = `${data.total} résultat${data.total > 1 ? 's' : ''}`;
+      document.getElementById('testsFootnote').textContent = data.total > data.shown
+        ? `Affichage des ${data.shown} premiers résultats sur ${data.total}. Affine ta recherche pour retrouver les autres.`
+        : 'La liste est triée du plus récent au plus ancien.';
+
+      for (const test of data.tests) {
+        const tr = document.createElement('tr');
+        tr.append(makeCell(test.name1), makeCell(test.name2));
+        const scoreCell = document.createElement('td');
+        const score = document.createElement('span');
+        score.className = 'score';
+        score.textContent = `${test.score} %`;
+        scoreCell.append(score);
+        tr.append(scoreCell);
+        const typeCell = document.createElement('td');
+        const type = document.createElement('span');
+        type.className = test.special ? 'enabled-tag' : 'disabled-tag';
+        type.textContent = test.special ? 'Règle spéciale' : 'Classique';
+        typeCell.append(type);
+        if (test.special && test.matchedRuleLabel) {
+          const details = document.createElement('div');
+          details.className = 'type-label';
+          details.textContent = test.matchedRuleLabel;
+          typeCell.append(details);
+        }
+        tr.append(typeCell, makeCell(formatDate(test.createdAt)));
+        const actionCell = document.createElement('td');
+        const deleteButton = document.createElement('button');
+        deleteButton.className = 'button danger small';
+        deleteButton.type = 'button';
+        deleteButton.textContent = 'Supprimer';
+        deleteButton.addEventListener('click', async () => {
+          if (!confirm(`Supprimer ce test entre « ${test.name1} » et « ${test.name2} » ? Le prochain test pourra créer un nouveau résultat.`)) return;
+          try {
+            await api(`/api/admin/tests/${encodeURIComponent(test.id)}`, { method: 'DELETE' });
+            await refreshAll();
+            globalMessage.textContent = 'Test supprimé.';
+          } catch (error) { globalMessage.textContent = error.message; }
+        });
+        actionCell.append(deleteButton);
+        tr.append(actionCell);
+        testsBody.append(tr);
+      }
+    }
+
+    async function loadRules() {
+      const rules = await api('/api/admin/rules');
+      rulesList.replaceChildren();
+      document.getElementById('ruleCount').textContent = `${rules.length} règle${rules.length > 1 ? 's' : ''}`;
+      if (!rules.length) {
+        const empty = document.createElement('p');
+        empty.className = 'empty';
+        empty.textContent = 'Aucune règle. Ajoute-en une avec le formulaire ci-dessus.';
+        rulesList.append(empty);
+        return;
+      }
+
+      for (const rule of rules) {
+        const row = document.createElement('div');
+        row.className = 'rule-row';
+
+        const leftWrap = document.createElement('div');
+        const leftLabel = document.createElement('label');
+        leftLabel.textContent = 'Mot-clé A';
+        const leftInput = document.createElement('input');
+        leftInput.value = rule.leftKeyword;
+        leftInput.maxLength = 80;
+        leftInput.setAttribute('aria-label', `Mot-clé A : ${rule.leftKeyword}`);
+        leftWrap.append(leftLabel, leftInput);
+
+        const rightWrap = document.createElement('div');
+        const rightLabel = document.createElement('label');
+        rightLabel.textContent = 'Mot-clé B';
+        const rightInput = document.createElement('input');
+        rightInput.value = rule.rightKeyword;
+        rightInput.maxLength = 80;
+        rightInput.setAttribute('aria-label', `Mot-clé B : ${rule.rightKeyword}`);
+        rightWrap.append(rightLabel, rightInput);
+
+        const scoreWrap = document.createElement('div');
+        const scoreLabel = document.createElement('label');
+        scoreLabel.textContent = 'Score (%)';
+        const scoreInput = document.createElement('input');
+        scoreInput.type = 'number';
+        scoreInput.min = '1';
+        scoreInput.max = '100';
+        scoreInput.value = String(rule.score);
+        scoreWrap.append(scoreLabel, scoreInput);
+
+        const meta = document.createElement('div');
+        meta.className = 'rule-meta';
+        const labelInput = document.createElement('input');
+        labelInput.value = rule.label || '';
+        labelInput.maxLength = 160;
+        labelInput.setAttribute('aria-label', 'Description de la règle');
+        labelInput.placeholder = 'Description de la règle';
+        const status = document.createElement('span');
+        status.className = rule.enabled ? 'enabled-tag' : 'disabled-tag';
+        status.textContent = rule.enabled ? 'Activée' : 'Désactivée';
+        meta.append(labelInput, status);
+
+        const actions = document.createElement('div');
+        actions.className = 'rule-actions';
+        const saveButton = document.createElement('button');
+        saveButton.className = 'button primary small';
+        saveButton.type = 'button';
+        saveButton.textContent = 'Enregistrer';
+        saveButton.addEventListener('click', async () => {
+          try {
+            await api(`/api/admin/rules/${encodeURIComponent(rule.id)}`, {
+              method: 'PATCH',
+              body: JSON.stringify({ leftKeyword: leftInput.value, rightKeyword: rightInput.value, score: Number(scoreInput.value), label: labelInput.value }),
+            });
+            await refreshAll();
+            globalMessage.textContent = 'Règle mise à jour.';
+          } catch (error) { globalMessage.textContent = error.message; }
+        });
+
+        const toggleButton = document.createElement('button');
+        toggleButton.className = 'button small';
+        toggleButton.type = 'button';
+        toggleButton.textContent = rule.enabled ? 'Désactiver' : 'Activer';
+        toggleButton.addEventListener('click', async () => {
+          try {
+            await api(`/api/admin/rules/${encodeURIComponent(rule.id)}`, { method: 'PATCH', body: JSON.stringify({ enabled: !rule.enabled }) });
+            await refreshAll();
+            globalMessage.textContent = rule.enabled ? 'Règle désactivée.' : 'Règle activée.';
+          } catch (error) { globalMessage.textContent = error.message; }
+        });
+
+        const deleteButton = document.createElement('button');
+        deleteButton.className = 'button danger small';
+        deleteButton.type = 'button';
+        deleteButton.textContent = 'Supprimer';
+        deleteButton.addEventListener('click', async () => {
+          if (!confirm(`Supprimer la règle « ${rule.label} » ? Les tests déjà enregistrés ne seront pas modifiés.`)) return;
+          try {
+            await api(`/api/admin/rules/${encodeURIComponent(rule.id)}`, { method: 'DELETE' });
+            await refreshAll();
+            globalMessage.textContent = 'Règle supprimée.';
+          } catch (error) { globalMessage.textContent = error.message; }
+        });
+        actions.append(saveButton, toggleButton, deleteButton);
+        row.append(leftWrap, rightWrap, scoreWrap, meta, actions);
+        rulesList.append(row);
+      }
+    }
+
+    async function refreshAll() {
+      globalMessage.textContent = '';
+      await Promise.all([loadStats(), loadTests(), loadRules()]);
+    }
+
+    loginForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      loginMessage.textContent = '';
+      loginButton.disabled = true;
+      try {
+        await api('/api/admin/login', { method: 'POST', body: JSON.stringify({ password: document.getElementById('password').value }) });
+        document.getElementById('password').value = '';
+        showDashboard();
+        await refreshAll();
+      } catch (error) { loginMessage.textContent = error.message; }
+      finally { loginButton.disabled = false; }
+    });
+
+    logoutButton.addEventListener('click', async () => {
+      try { await api('/api/admin/logout', { method: 'POST', body: '{}' }); } catch { /* on affiche tout de même la page de connexion */ }
+      showLogin();
+      loginMessage.textContent = 'Tu es déconnecté.';
+    });
+
+    document.getElementById('refreshButton').addEventListener('click', async () => {
+      try { await refreshAll(); globalMessage.textContent = 'Données actualisées.'; }
+      catch (error) { globalMessage.textContent = error.message; }
+    });
+
+    document.getElementById('searchForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      currentSearch = document.getElementById('searchInput').value.trim();
+      try { await loadTests(); }
+      catch (error) { globalMessage.textContent = error.message; }
+    });
+
+    document.getElementById('clearSearch').addEventListener('click', async () => {
+      document.getElementById('searchInput').value = '';
+      currentSearch = '';
+      try { await loadTests(); }
+      catch (error) { globalMessage.textContent = error.message; }
+    });
+
+    document.getElementById('addRuleForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const body = {
+        leftKeyword: document.getElementById('leftKeyword').value.trim(),
+        rightKeyword: document.getElementById('rightKeyword').value.trim(),
+        score: Number(document.getElementById('newScore').value),
+        label: document.getElementById('ruleLabel').value.trim(),
+      };
+      try {
+        await api('/api/admin/rules', { method: 'POST', body: JSON.stringify(body) });
+        document.getElementById('addRuleForm').reset();
+        document.getElementById('newScore').value = '100';
+        await refreshAll();
+        globalMessage.textContent = 'Nouvelle règle ajoutée.';
+      } catch (error) { globalMessage.textContent = error.message; }
+    });
+
+    (async function start() {
+      try {
+        await api('/api/admin/me');
+        showDashboard();
+        await refreshAll();
+      } catch { showLogin(); }
+    })();
+  </script>
+</body>
+</html>
